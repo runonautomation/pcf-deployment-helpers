@@ -19,6 +19,7 @@ Create deployment service account in Cloud Shell
 #### 01_create_service_account.sh
 Use the script to generate a service account and a key to GCP project
 #### Clone terraforming-gcp repository
+
 #### Generate certificates
 ```
 DOMAIN=pcf.glpractices.com ./03_gencert.sh 
@@ -26,7 +27,11 @@ DOMAIN=pcf.glpractices.com ./03_gencert.sh
 
 #### Set variables for terraforming solution
 ```
-DOMAIN=pcf.glpractices.com ./04_set_terraform_variables.sh 
+DOMAIN=pcf.glpractices.com ./041_set_terraforming_vars.sh
+```
+#### Set variables for self-signeg certificates generation
+```
+DOMAIN=pcf.glpractices.com ./041_set_terraforming_vars.sh
 ```
 
 
