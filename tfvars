@@ -3,7 +3,7 @@ project          = "${PROJECT_ID}"
 region           = "${REGION}"
 zones            = ["${REGION}-a", "${REGION}-b", "${REGION}-c"]
 dns_suffix       = "${DOMAIN}"
-opsman_image_url = "https://storage.googleapis.com/ops-manager-us/pcf-gcp-2.1-build.304.tar.gz"
+opsman_image_url = "https://storage.googleapis.com/ops-manager-us/pcf-gcp-2.2-build.305.tar.gz"
 pks              = true
 external_database = true
 
