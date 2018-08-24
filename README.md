@@ -16,11 +16,17 @@ pcf.pcf.domain.com (Ops Manager)
 Deploy a GCP project or two projects if you wish to keep terraform automation in a separate project.
 Deploy a bastion host in a separate network that will have the deployment prerequisites installed.
 Create deployment service account in Cloud Shell
-
+#### 01_create_service_account.sh
+Use the script to generate a service account and a key to GCP project
+#### Clone terraforming-gcp repository
+#### Generate certificates
 ```
-gcloud iam service-accounts create deploy --display-name "deploy"
-gcloud iam service-accounts keys create deploy.key.json --iam-account deploy@$PROJECT_ID.iam.gserviceaccount.com
-gcloud projects add-iam-policy-binding $PROJECT_ID --member "serviceAccount:deploy@$PROJECT_ID.iam.gserviceaccount.com" --role 'roles/owner'
+DOMAIN=pcf.glpractices.com ./03_gencert.sh 
+```
+
+#### Set variables for terraforming solution
+```
+DOMAIN=pcf.glpractices.com ./04_set_terraform_variables.sh 
 ```
 
 
