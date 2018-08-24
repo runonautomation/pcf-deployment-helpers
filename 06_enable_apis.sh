@@ -1,4 +1,4 @@
 echo ENABLE THE FOLLOWING APIS:
-echo https://console.developers.google.com/apis/api/iam.googleapis.com/overview
-echo https://console.developers.google.com/apis/api/cloudresourcemanager.googleapis.com/overview
-echo https://console.developers.google.com/apis/api/dns.googleapis.com/overview
+gcloud services enable iam.googleapis.com
+gcloud services enable cloudresourcemanager.googleapis.com
+gcloud services enable dns.googleapis.com
