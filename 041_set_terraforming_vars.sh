@@ -1,5 +1,5 @@
 export DOMAIN=${DOMAIN:-example.com}
-export TERRAFORM_SOLUTION_PATH=${TERRAFORM_SOLUTION_PATH:-~/terraforming-gcp}
+export TERRAFORM_SOLUTION_PATH=${TERRAFORM_SOLUTION_PATH:-./terraforming-gcp}
 export SSLCA=$(cat gen/root-ca/certs/ca.crt)
 export SSLCAK=$(cat gen/root-ca/private/ca.key)
 export PROJECT_ID=$(cat deploy.key.json  | grep project_id | awk -F\" '{print $4}')
