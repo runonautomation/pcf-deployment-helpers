@@ -1,5 +1,5 @@
 set -e
-export DOMAIN=${DOMAIN:-example.com}
+export DOMAIN=${DOMAIN:-glpractices.com}
 export TERRAFORM_SOLUTION_PATH=${TERRAFORM_SOLUTION_PATH:-./pcfcerts}
 export KEY_LOCATION=${KEY_LOCATION:-~/deploy.key.json}
 

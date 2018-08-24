@@ -3,7 +3,7 @@
 set -e
 mkdir -p gen 
 
-export DOMAIN=${DOMAIN:-example.com}
+export DOMAIN=${DOMAIN:-glpractices.com}
 
 rm gen/root-ca/index.txt* gen/root-ca/newcerts/ -rf
 
