@@ -11,4 +11,4 @@ export REGION=us-central1
 export SK=$(cat $KEY_LOCATION )
 
 envsubst < "tfvars" > "$TERRAFORM_SOLUTION_PATH/terraform.tfvars"
-cat makecerts/terraform.tfvars
+cat $TERRAFORM_SOLUTION_PATH/terraform.tfvars
