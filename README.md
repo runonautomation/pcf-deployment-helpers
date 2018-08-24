@@ -22,16 +22,16 @@ Use the script to generate a service account and a key to GCP project
 
 #### Generate certificates
 ```
-DOMAIN=pcf.glpractices.com ./03_gencert.sh 
+DOMAIN=glpractices.com ./03_gencert.sh 
 ```
 
 #### Set variables for terraforming solution
 ```
-DOMAIN=pcf.glpractices.com ./041_set_terraforming_vars.sh
+DOMAIN=glpractices.com ./041_set_terraforming_vars.sh
 ```
 #### Set variables for self-signeg certificates generation
 ```
-DOMAIN=pcf.glpractices.com ./041_set_terraforming_vars.sh
+DOMAIN=glpractices.com ./042_set_pcfcerts_vars.sh
 ```
 
 
