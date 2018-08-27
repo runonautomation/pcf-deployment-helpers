@@ -5,7 +5,7 @@ zones            = ["${REGION}-a", "${REGION}-b", "${REGION}-c"]
 dns_suffix       = "${DOMAIN}"
 opsman_image_url = "https://storage.googleapis.com/ops-manager-us/pcf-gcp-2.2-build.305.tar.gz"
 pks              = true
-external_database = true
+external_database = false
 
 buckets_location = "US"
 
