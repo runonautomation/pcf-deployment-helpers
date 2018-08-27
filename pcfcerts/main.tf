@@ -47,8 +47,11 @@ resource "tls_private_key" "ssl_private_key" {
   count = "${length(var.ssl_ca_cert) > 0 ? 1 : 0}"
 }
 
+output "ssl_ca_cert" {
+  value     = "${var.ssl_ca_cert}"
+}
+
 output "ssl_cert" {
-  sensitive = true
   value     = "${element(concat(tls_locally_signed_cert.ssl_cert.*.cert_pem, list("")),0)}"
 }
 

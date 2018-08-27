@@ -32,6 +32,10 @@ gcloud services enable sqladmin.googleapis.com
 ```
 
 ### Bastion
+#### Place your service account key to your home with name deploy.key.json
+```
+mv KEY ~/deploy.key.json
+```
 #### Clone terraforming-gcp repository
 Change working directory to current and clone terraform repo for PCF
 ```
@@ -46,6 +50,7 @@ Create applications, system components and login component keys.
 DOMAIN=glpractices.com ./030_gencert.sh 
 ```
 #### Set variables for terraforming solution
+Inspect tfvars file and edit the region zone names if necessary
 ```
 DOMAIN=glpractices.com ./041_set_terraforming_vars.sh
 ```
@@ -62,6 +67,7 @@ DOMAIN=glpractices.com ./042_set_pcfcerts_vars.sh
 Deploy the Ops Manager with Terraform
 ```
 cd terraforming-gcp
+terraform init
 terraform plan -out=plan
 terraform apply plan
 ```
@@ -69,30 +75,43 @@ terraform apply plan
 ### Pivotal Network
 Download PAS, PKS, MYSQL Artifacts and stemcells from network.pivotal.io to the bastion
 
-
 ### Ops Manager
+#### BOSH Director for GCP setup
+Configure BOSH Director via the wizard.
+https://docs.pivotal.io/pivotalcf/2-2/customizing/gcp-om-config-terraform.html
+NTP: metadata.google.internal
+Add AZs
+In networks section use the grep of output to get the details:
+```
+terraform output | grep -C 1 management
+```
+Set network name in format: pcf-pcf-network/management/us-central1
+Reserve .1 and .2 address (e.g. 10.0.0.1-10.0.0.2)
+
+When set - Apply changes
+
+
 #### Import artifacts
 https://docs.pivotal.io/pivotalcf/2-0/customizing/gcp-om-config-terraform.html
 Import installation artifacts. PAS/PKS/MYSQL/Other required.
-
-### Initial setup
-Login to Ops Manager and import products via UI using import product button
-Tip:
 If you wish to speed up the process, after configuring login and password on Ops Manager node you can use the reference script for local artifact import:
 
 ```
-curl -s -k -H 'Accept: application/json;charset=utf-8' -d 'grant_type=password' -d 'username=admin' -d 'password=PASSWORD' -u 'opsman:' https://localhost/uaa/oauth/token
-export T="TOKEN HERE"
-curl -vv -H "Authorization: bearer $T" -k -X POST https://localhost/api/v0/available_products -F 'product[file]=@/home/volodymyr_davydenko/srt-2.1.5-build.1.pivotal'
+USERNAME=admin
+PASSWORD=password
+ENDPOINT='https://pcf.pcf.glpractices.com'
+TOKEN=$(curl -s -k -H 'Accept: application/json;charset=utf-8' -d "grant_type=password" -d "username=$USERNAME" -d "password=$PASSWORD" -u 'opsman:' "${ENDPOINT}/uaa/oauth/token" | jq .access_token | tr -d '"')
+echo $TOKEN
+curl -vv -H "Authorization: Bearer $TOKEN" -k --verbose --progress-bar -X POST "${ENDPOINT}/api/v0/available_products" -F "product[file]=@artifactname"
 ```
 
 ### Ops Manager/Product installation
 #### Deploy Pivotal Application Service
 https://docs.pivotal.io/pivotalcf/2-0/customizing/gcp-er-config.html
+https://docs.pivotal.io/pivotalcf/2-2/customizing/gcp-er-config-terraform.html
 
 Create user:
 https://docs.cloudfoundry.org/uaa/uaa-user-management.html
-
 
 #### Pivotal Container Service
 https://docs.pivotal.io/runtimes/pks/1-0/gcp-prepare-env.html
@@ -113,10 +132,8 @@ https://docs.pivotal.io/p-mysql/2-1/install-config.html
 #### Save configuration
 Go to user -> settings -> Export installation settings..
 Save the installation settings and record the encryption key so you will be able to restore your infrastructure when needed.
-
 Note: Please be very careful at each step of Ops Manager Product Installation and consult the referenced documentation. 
 Installation process in long and takes a lot of time and attempts.
-
 
 ### Application deployment quickstart
 To push a sample application you need to:
