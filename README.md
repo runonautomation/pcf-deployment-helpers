@@ -110,6 +110,9 @@ curl -vv -H "Authorization: Bearer $TOKEN" -k --verbose --progress-bar -X POST "
 https://docs.pivotal.io/pivotalcf/2-0/customizing/gcp-er-config.html
 https://docs.pivotal.io/pivotalcf/2-2/customizing/gcp-er-config-terraform.html
 
+DOMAINS: terraform output | grep domain
+LOGIN: Use the certificates generated from pcfcerts folder
+
 Create user:
 https://docs.cloudfoundry.org/uaa/uaa-user-management.html
 
@@ -124,9 +127,6 @@ https://docs.pivotal.io/runtimes/pks/1-0/manage-users.html
 
 Login to PKS and create cluster:
 https://docs.pivotal.io/runtimes/pks/1-0/installing-pks-cli.html#login
-
-#### Mysql Ops Manager/Product installation
-https://docs.pivotal.io/p-mysql/2-1/install-config.html
 
 ### Operations
 #### Save configuration
