@@ -164,3 +164,50 @@ cf login -a api.sys.<env>.<domain> --skip-ssl-validation (as developer)
 cf push
 ```
 
+
+#### Settings automation
+Create a metadata file for the installation
+```
+cat<<EOF >metadata
+---
+opsmgr:
+    url: https://pcf.pcf.glpractices.com
+    username: admin
+    password: <redacted>
+EOF
+```
+
+```
+wget https://github.com/cf-platform-eng/tile-generator/releases/download/v12.0.7/pcf_linux-64bit
+chmod +x pcf_linux-64bit
+sudo mv pcf_linux-64bit /usr/local/bin/pcf
+```
+
+#### Ops manager tile installation details
+- Enter project ID
+- Enter NPT servers
+- enter AZs (terraform output azs)
+- Set networks
+```
+CURRENT=management
+echo $(terraform output | grep network_name | awk '{print $3}')/$(terraform output | grep ${CURRENT}_subnet_name| awk '{print $3}')/$(terraform output | grep region | awk '{print $3}')
+terraform output | grep network &&  terraform output | grep -C 1 $CURRENT
+
+CURRENT=pas
+echo $(terraform output | grep network_name | awk '{print $3}')/$(terraform output | grep ${CURRENT}_subnet_name| awk '{print $3}')/$(terraform output | grep region | awk '{print $3}')
+terraform output | grep network &&  terraform output | grep -C 1 $CURRENT
+
+CURRENT=services
+echo $(terraform output | grep network_name | awk '{print $3}')/$(terraform output | grep ${CURRENT}_subnet_name| grep -v pks| awk '{print $3}')/$(terraform output | grep region | awk '{print $3}')
+terraform output | grep network &&  terraform output | grep -C 1 $CURRENT | grep -v pks
+
+CURRENT=pks
+echo $(terraform output | grep network_name | awk '{print $3}')/$(terraform output | grep ${CURRENT}_subnet_name| grep -v services| awk '{print $3}')/$(terraform output | grep region | awk '{print $3}')
+terraform output | grep network &&  terraform output | grep -v account | grep -v services  | grep -C 1 $CURRENT 
+
+CURRENT=services
+echo $(terraform output | grep network_name | awk '{print $3}')/$(terraform output | grep ${CURRENT}_subnet_name | grep pks | awk '{print $3}')/$(terraform output | grep region | awk '{print $3}')
+terraform output | grep network && terraform output  | grep -C 1 $CURRENT | grep pks -C 1
+
+```
+#### PAS tile installation details
