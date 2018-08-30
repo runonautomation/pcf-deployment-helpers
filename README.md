@@ -102,7 +102,7 @@ PASSWORD=password
 ENDPOINT='https://pcf.pcf.glpractices.com'
 TOKEN=$(curl -s -k -H 'Accept: application/json;charset=utf-8' -d "grant_type=password" -d "username=$USERNAME" -d "password=$PASSWORD" -u 'opsman:' "${ENDPOINT}/uaa/oauth/token" | jq .access_token | tr -d '"')
 echo $TOKEN
-curl -vv -H "Authorization: Bearer $TOKEN" -k --verbose --progress-bar -X POST "${ENDPOINT}/api/v0/available_products" -F "product[file]=@artifactname"
+curl -vv -H "Authorization: Bearer $TOKEN" -k --verbose --progress-bar -X POST "${ENDPOINT}/api/v0/available_products" -F "product[file]=@sfpas"
 ```
 
 ### Ops Manager/Product installation
@@ -129,6 +129,14 @@ Login to PKS and create cluster:
 https://docs.pivotal.io/runtimes/pks/1-0/installing-pks-cli.html#login
 
 ### Operations
+
+#### Stop a deployment 
+```
+bosh deployments
+bosh -d cf-XXX stop --hard
+bosh -d cf-XXX start
+```
+
 #### Save configuration
 Go to user -> settings -> Export installation settings..
 Save the installation settings and record the encryption key so you will be able to restore your infrastructure when needed.
