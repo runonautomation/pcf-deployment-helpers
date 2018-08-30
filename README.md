@@ -211,3 +211,41 @@ terraform output | grep network && terraform output  | grep -C 1 $CURRENT | grep
 
 ```
 #### PAS tile installation details
+- Select all AZs
+- Set domains
+```
+sys.pcf.glpractices.com
+apps.pcf.glpractices.com
+```
+- Networking
+```
+# For the cert and key section:
+terraform output ssl_cert
+terraform output ssl_private_key
+
+# Enter CA certs where required to trusted
+cat ../gen/root-ca/certs/ca.crt
+
+# Tick Disable SSL certificate verification for this environment
+```
+
+- UAA
+For SAML please use the certs that can be generated with
+```
+root@terraform:~/pcf-deployment-helpers/pcfcerts# 
+```
+
+- File storage
+```
+terraform output pas_blobstore_gcp_service_account_key
+terraform output | grep blob -C 3
+terraform output  | grep bucket -C 1
+```
+
+- Resources load balancer
+```
+Router: tcp:pcf-cf-ws,http:pcf-httpslb
+Control: tcp:pcf-cf-ssh
+```
+
+- Verify that blobstore account is Storage Admin (add if necessary)
