@@ -158,12 +158,11 @@ Login and push your application:
 ```
 cf login -a api.sys.<env>.<domain> --skip-ssl-validation
 cf create-user devuser1 password1
-cf set-space-role devuser1 org1 space1 SpaceDeveloper
+cf set-space-role devuser1 practices dev SpaceDeveloper
 cf logout
-cf login -a api.sys.<env>.<domain> --skip-ssl-validation (as developer)
+cf login --skip-ssl-validation -a api.sys.<env>.<domain>  (as developer)
 cf push
 ```
-
 
 #### Settings automation
 Create a metadata file for the installation
