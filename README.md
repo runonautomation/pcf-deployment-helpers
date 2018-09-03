@@ -228,6 +228,8 @@ cat ../gen/root-ca/certs/ca.crt
 
 # Tick Disable SSL certificate verification for this environment
 ```
+- CredHub
+Entera big key an mark it as Primary 
 
 - UAA
 For SAML please use the certs that can be generated with
@@ -241,6 +243,8 @@ terraform output pas_blobstore_gcp_service_account_key
 terraform output | grep blob -C 3
 terraform output  | grep bucket -C 1
 ```
+Add manually a project viewer role for the 
+service account to be able to list buckets
 
 - Resources load balancer
 ```
@@ -249,3 +253,4 @@ Control: tcp:pcf-cf-ssh
 ```
 
 - Verify that blobstore account is Storage Admin (add if necessary)
+- Note: due to balancers initialization ERRANDS installation might fail. If that happens - pleaase wait 10 minutes and rerun the PAS setup for small footprint PAS.
