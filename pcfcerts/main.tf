@@ -9,6 +9,8 @@ resource "tls_cert_request" "ssl_csr" {
 
   dns_names = [
     "*.login.sys.${var.env_name}.${var.dns_suffix}",
+    "*.pks.${var.env_name}.${var.dns_suffix}",
+    "*.ws.${var.env_name}.${var.dns_suffix}",
   ]
 
   count = "${length(var.ssl_ca_cert) > 0 ? 1 : 0}"
