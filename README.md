@@ -253,3 +253,19 @@ Control: tcp:pcf-cf-ssh
 
 - Verify that blobstore account is Storage Admin (add if necessary)
 - Note: due to balancers initialization ERRANDS installation might fail. If that happens - pleaase wait 10 minutes and rerun the PAS setup for small footprint PAS.
+
+
+#### PKS tile installation details
+- In assign AZ and Networks select pks and pks services network
+- In PKS API choose pks.pcf.glpractices.com as domain
+- In PKS api for SSL certs please use the certs that can be generated with
+```
+root@terraform:~/pcf-deployment-helpers/pcfcerts# 
+```
+- In cloud provider please use data from
+```
+terraform output | grep project_id
+terraform output | grep network
+terraform output | grep pks
+```
+- In resources load balancer select tcp:pcf-pks-api
