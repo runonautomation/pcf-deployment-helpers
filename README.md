@@ -2,7 +2,6 @@
 During the evaluation DevOps practice tried the available ways to deploy PCF on Google Cloud Platform, and came to conclusion that recommended approach is to use GCP terraform scripts to deploy the platform. 
 Below you can find an action reference playbook for start the platform installation from scratch on your account.
 
-
 ### DNS
 Register a DNS zone for your deployment.
 Example dns zone: glpractices.com
@@ -31,7 +30,7 @@ gcloud services enable dns.googleapis.com
 gcloud services enable sqladmin.googleapis.com
 ```
 
-### Bastion
+### Bastion preparation
 #### Place your service account key to your home with name deploy.key.json
 ```
 mv KEY ~/deploy.key.json
@@ -41,6 +40,29 @@ Change working directory to current and clone terraform repo for PCF
 ```
 git clone https://github.com/pivotal-cf/terraforming-gcp.git
 ```
+
+Make sure that the solution directory tree looks like:
+```
+root@terraform:~# tree -d
+.
+├── installers
+└── pcf-deployment-helpers
+    ├── gen
+    │   └── root-ca
+    │       ├── certs
+    │       ├── crl
+    │       ├── newcerts
+    │       └── private
+    ├── pcfcerts
+    └── terraforming-gcp
+        ├── external_database
+        ├── isolation_segment
+        └── pks
+```
+
+Where pcf-deployment-helpers is this repo
+pcf-deployment-helpers/terraforming-gcp is the PCF repo from https://github.com/pivotal-cf/terraforming-gcp.git
+
 
 #### Generate certificates
 Generate a Certificate Authority and a Private Key
@@ -63,7 +85,7 @@ DOMAIN=glpractices.com ./042_set_pcfcerts_vars.sh
 DOMAIN=glpractices.com ./042_set_pcfcerts_vars.sh
 ```
 
-### Terraform
+#### Terraform
 Deploy the Ops Manager with Terraform
 ```
 cd terraforming-gcp
@@ -74,6 +96,7 @@ terraform apply plan
 
 ### Pivotal Network
 Download PAS, PKS, MYSQL Artifacts and stemcells from network.pivotal.io to the bastion
+
 
 ### Ops Manager
 #### BOSH Director for GCP setup
@@ -105,83 +128,13 @@ echo $TOKEN
 curl -vv -H "Authorization: Bearer $TOKEN" -k --verbose --progress-bar -X POST "${ENDPOINT}/api/v0/available_products" -F "product[file]=@sfpas"
 ```
 
-### Ops Manager/Product installation
-#### Deploy Pivotal Application Service
-https://docs.pivotal.io/pivotalcf/2-0/customizing/gcp-er-config.html
-https://docs.pivotal.io/pivotalcf/2-2/customizing/gcp-er-config-terraform.html
-
-DOMAINS: terraform output | grep domain
-LOGIN: Use the certificates generated from pcfcerts folder
-
-Create user:
-https://docs.cloudfoundry.org/uaa/uaa-user-management.html
-
-#### Pivotal Container Service
-https://docs.pivotal.io/runtimes/pks/1-0/gcp-prepare-env.html
-
-Perform PKS product installation
-https://docs.pivotal.io/runtimes/pks/1-0/installing-pks.html
-
-Create user:
-https://docs.pivotal.io/runtimes/pks/1-0/manage-users.html
-
-Login to PKS and create cluster:
-https://docs.pivotal.io/runtimes/pks/1-0/installing-pks-cli.html#login
-
-### Operations
-
-#### Stop a deployment 
-```
-bosh deployments
-bosh -d cf-XXX stop --hard
-bosh -d cf-XXX start
-```
-
 #### Save configuration
 Go to user -> settings -> Export installation settings..
 Save the installation settings and record the encryption key so you will be able to restore your infrastructure when needed.
 Note: Please be very careful at each step of Ops Manager Product Installation and consult the referenced documentation. 
 Installation process in long and takes a lot of time and attempts.
 
-### Application deployment quickstart
-To push a sample application you need to:
-
-- Go to Ops Manager 
-- Go to PAS Product
-- Open credentials
-- Open UAA -> Admin credentials 
-- Go to https://apps.env.domain.com and login
-- Create organization org1 and space space1
-- Download cf cli
-
-Login and push your application:
-```
-cf login -a api.sys.<env>.<domain> --skip-ssl-validation
-cf create-user devuser1 password1
-cf set-space-role devuser1 practices dev SpaceDeveloper
-cf logout
-cf login --skip-ssl-validation -a api.sys.<env>.<domain>  (as developer)
-cf push
-```
-
-#### Settings automation
-Create a metadata file for the installation
-```
-cat<<EOF >metadata
----
-opsmgr:
-    url: https://pcf.pcf.glpractices.com
-    username: admin
-    password: <redacted>
-EOF
-```
-
-```
-wget https://github.com/cf-platform-eng/tile-generator/releases/download/v12.0.7/pcf_linux-64bit
-chmod +x pcf_linux-64bit
-sudo mv pcf_linux-64bit /usr/local/bin/pcf
-```
-
+### OPS Manager
 #### Ops manager tile installation details
 - Enter project ID
 - Enter NPT servers
@@ -209,6 +162,46 @@ echo $(terraform output | grep network_name | awk '{print $3}')/$(terraform outp
 terraform output | grep network && terraform output  | grep -C 1 $CURRENT | grep pks -C 1
 
 ```
+### Operations
+#### Stop a deployment 
+```
+bosh deployments
+bosh -d cf-XXX stop --hard
+bosh -d cf-XXX start
+```
+
+#### Settings automation
+Create a metadata file for the installation
+```
+cat<<EOF >metadata
+---
+opsmgr:
+    url: https://pcf.pcf.glpractices.com
+    username: admin
+    password: <redacted>
+EOF
+```
+PCF Command Line Tool
+```
+wget https://github.com/cf-platform-eng/tile-generator/releases/download/v12.0.7/pcf_linux-64bit
+chmod +x pcf_linux-64bit
+sudo mv pcf_linux-64bit /usr/local/bin/pcf
+```
+
+## PAS
+#### Deploy Pivotal Application Service
+Please refer to the below documentation.
+https://docs.pivotal.io/pivotalcf/2-0/customizing/gcp-er-config.html
+https://docs.pivotal.io/pivotalcf/2-2/customizing/gcp-er-config-terraform.html
+
+In the text below you can see things that are not obvious and that you MUST set.
+
+DOMAINS: terraform output | grep domain
+LOGIN: Use the certificates generated from pcfcerts folder
+
+Create user:
+https://docs.cloudfoundry.org/uaa/uaa-user-management.html
+
 #### PAS tile installation details
 - Select all AZs
 - Set domains
@@ -254,10 +247,41 @@ Control: tcp:pcf-cf-ssh
 - Verify that blobstore account is Storage Admin (add if necessary)
 - Note: due to balancers initialization ERRANDS installation might fail. If that happens - pleaase wait 10 minutes and rerun the PAS setup for small footprint PAS.
 
+#### Application deployment quickstart
+To push a sample application you need to:
 
+- Go to Ops Manager 
+- Go to PAS Product
+- Open credentials
+- Open UAA -> Admin credentials 
+- Go to https://apps.env.domain.com and login
+- Create organization org1 and space space1
+- Download cf cli
+
+Login and push your application:
+```
+cf login -a api.sys.<env>.<domain> --skip-ssl-validation
+cf create-user devuser1 password1
+cf set-space-role devuser1 practices dev SpaceDeveloper
+cf logout
+cf login --skip-ssl-validation -a api.sys.<env>.<domain>  (as developer)
+cf push
+```
+
+## PKS
+https://docs.pivotal.io/runtimes/pks/1-0/gcp-prepare-env.html
+
+Perform PKS product installation
+https://docs.pivotal.io/runtimes/pks/1-0/installing-pks.html
+
+Create user:
+https://docs.pivotal.io/runtimes/pks/1-0/manage-users.html
+
+Login to PKS and create cluster:
+https://docs.pivotal.io/runtimes/pks/1-0/installing-pks-cli.html#login
 #### PKS tile installation details
 - In assign AZ and Networks select pks and pks services network
-- In PKS API choose pks.pcf.glpractices.com as domain
+- In PKS API choose api.pks.pcf.glpractices.com as domain
 - In PKS api for SSL certs please use the certs that can be generated with
 ```
 root@terraform:~/pcf-deployment-helpers/pcfcerts# 
@@ -269,3 +293,16 @@ terraform output | grep network
 terraform output | grep pks
 ```
 - In resources load balancer select tcp:pcf-pks-api
+
+#### PKS usage intro
+- Go to PKS tile installation, credentials, and copy value for Pks Uaa Management Admin Client
+- Login to PKS
+```
+pks login -a api.pks.pcf.glpractices.com:8443 --skip-ssl-validation -u admin -p
+
+```
+
+Helpers:
+Install UAAC client
+```
+sudo apt-get install -y ruby-dev rubygems libssl-dev ruby-full gcc make g++
